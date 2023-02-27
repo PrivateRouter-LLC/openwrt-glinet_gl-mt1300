@@ -22,7 +22,7 @@ fixPackagesDNS()
 {
     log_say "Fixing DNS and installing required packages for opkg"
     # Set our router's dns
-    log_say "nameserver 1.1.1.1" > /etc/resolv.conf
+    echo "nameserver 1.1.1.1" > /etc/resolv.conf
 
     log_say "Installing opkg packages"
     opkg --no-check-certificate update
