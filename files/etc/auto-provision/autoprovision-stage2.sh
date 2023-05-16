@@ -21,9 +21,6 @@ wait_for_internet() {
     log_say "Internet connection established"
 }
 
-# Wait for Internet connection
-wait_for_internet
-
 # Command to wait for opkg to finish
 wait_for_opkg() {
   while pgrep -x opkg >/dev/null; do
@@ -31,22 +28,6 @@ wait_for_opkg() {
     sleep 1
   done
   log_say "opkg is released, our turn!"
-}
-
-# Wait for opkg to finish
-wait_for_opkg
-
-# Fix our DNS and update packages and do not check https certs
-fixPackagesDNS()
-{
-    log_say "Fixing DNS and installing required packages for opkg"
-    # Set our router's dns
-    echo "nameserver 1.1.1.1" > /etc/resolv.conf
-
-    log_say "Installing opkg packages"
-    opkg --no-check-certificate update
-    opkg --no-check-certificate install wget-ssl unzip ca-bundle ca-certificates
-    opkg --no-check-certificate install git git-http jq curl unzip
 }
 
 installPackages()
@@ -159,5 +140,27 @@ EOF
         reboot
     fi
 }
+
+# Fix our DNS and update packages and do not check https certs
+fixPackagesDNS()
+{
+    log_say "Fixing DNS and installing required packages for opkg"
+    # Set our router's dns
+    echo "nameserver 1.1.1.1" > /etc/resolv.conf
+
+    log_say "Installing opkg packages"
+    opkg --no-check-certificate update
+    opkg --no-check-certificate install wget-ssl unzip ca-bundle ca-certificates
+    opkg --no-check-certificate install git git-http jq curl unzip
+}
+
+# Wait for Internet connection
+wait_for_internet
+
+# Wait for opkg to finish
+wait_for_opkg
+
+# Fix our DNS Server and install some required packages
+fixPackagesDNS
 
 autoprovisionStage2
