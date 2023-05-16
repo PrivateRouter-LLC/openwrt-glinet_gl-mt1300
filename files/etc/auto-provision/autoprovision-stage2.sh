@@ -4,18 +4,37 @@
 
 . /etc/auto-provision/autoprovision-functions.sh
 
-# Verify we are connected to the Internet
-is_connected() {
-    ping -q -c3 1.1.1.1 >/dev/null 2>&1
-    return $?
-}
-
 # Log to the system log and echo if needed
 log_say()
 {
-    echo "${1}"
-    logger "${1}"
+    SCRIPT_NAME=$(basename "$0")
+    echo "${SCRIPT_NAME}: ${1}"
+    logger "${SCRIPT_NAME}: ${1}"
 }
+
+# Command to wait for Internet connection
+wait_for_internet() {
+    while ! ping -q -c3 1.1.1.1 >/dev/null 2>&1; do
+        log_say "Waiting for Internet connection..."
+        sleep 1
+    done
+    log_say "Internet connection established"
+}
+
+# Wait for Internet connection
+wait_for_internet
+
+# Command to wait for opkg to finish
+wait_for_opkg() {
+  while pgrep -x opkg >/dev/null; do
+    log_say "Waiting for opkg to finish..."
+    sleep 1
+  done
+  log_say "opkg is released, our turn!"
+}
+
+# Wait for opkg to finish
+wait_for_opkg
 
 # Fix our DNS and update packages and do not check https certs
 fixPackagesDNS()
@@ -44,15 +63,6 @@ installPackages()
 
     log "Autoprovisioning stage2 is about to install packages"
 
-    # switch ssh from dropbear to openssh (needed to install sshtunnel)
-    #opkg remove dropbear
-    #opkg install openssh-server openssh-sftp-server sshtunnel
-
-    #/etc/init.d/sshd enable
-    #mkdir /root/.ssh
-    #chmod 0700 /root/.ssh
-    #mv /etc/dropbear/authorized_keys /root/.ssh/
-    #rm -rf /etc/dropbear
    sed -i 's,https,http,g' /etc/opkg/distfeeds.conf;
     # CUSTOMIZE
     # install some more packages that don't need any extra steps
@@ -95,25 +105,15 @@ installPackages()
    opkg install git git-http jq curl bash wget kmod-usb-net-rndis luci-mod-dashboard luci-app-commands luci-app-vnstat rpcd-mod-luci luci-app-statistics luci-app-samba4 samba4-server luci-mod-admin-full luci-mod-network luci-mod-status luci-mod-system kmod-usb-net-cdc-eem
    opkg install  kmod-usb-net-cdc-ether kmod-usb-net-cdc-subset kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils luci-app-nlbwmon luci-app-adblock nano ttyd fail2ban speedtest-netperf opkg install vsftpd samba36-server luci-app-samba
 
- ## V2RAYA INSTALLER ##
-   log_say "Installing V2rayA..."
-  ## download
+   opkg update; opkg install unzip wget-ssl
 
-  opkg update; opkg install unzip wget-ssl
+   ## Remove DNSMasq
+   opkg remove dnsmasq
+   opkg install dnsmasq-full
 
-    ## Remove DNSMasq
+   sed -i 's,http,https,g' /etc/opkg/distfeeds.conf;
 
-  opkg remove dnsmasq
-
-  opkg install dnsmasq-full
-
-  opkg install v2raya
-
-  opkg install /etc/luci-app-v2raya_6_all.ipk
-
-  sed -i 's,http,https,g' /etc/opkg/distfeeds.conf;
-
-  log_say "PrivateRouter update complete!"
+   log_say "PrivateRouter update complete!"
 }
 
 autoprovisionStage2()
@@ -159,12 +159,5 @@ EOF
         reboot
     fi
 }
-
-# Check and wait for Internet connection
-while ! is_connected; do
-    log_say "Waiting for Internet connection..."
-    sleep 1
-done
-log_say "Internet connection established"
 
 autoprovisionStage2
