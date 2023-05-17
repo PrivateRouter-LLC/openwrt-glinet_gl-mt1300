@@ -50,7 +50,7 @@ installPackages()
    #sed -i 's,https,http,g' /etc/opkg/distfeeds.conf;
     # CUSTOMIZE
     # install some more packages that don't need any extra steps
- log_say "updating all packages!"
+   log_say "updating all packages!"
 
    log_say "                                                                      "
    log_say " ███████████             ███                         █████            "
@@ -108,9 +108,9 @@ autoprovisionStage2()
     log "Autoprovisioning stage2 speaking"
 
     # TODO this is a rather sloppy way to test whether stage2 has been done already, but this is a shell script...
-    if [ $(uci get system.@system[0].log_type) == "file" ]; then
-        log "Seems like autoprovisioning stage2 has been done already. Running stage3."
-    else
+    #if [ $(uci get system.@system[0].log_type) == "file" ]; then
+    #    log "Seems like autoprovisioning stage2 has been done already. Running stage3."
+    #else
         signalAutoprovisionWorking
 
         #echo "nameserver 1.1.1.1" > /etc/resolv.conf
@@ -131,19 +131,19 @@ chmod a+x /etc/stage3.sh
 bash /etc/stage3.sh || exit 1
 EOF
 
-        mkdir -p /var/log/archive
+        #mkdir -p /var/log/archive
 
         # logrotate is complaining without this directory
-        mkdir -p /var/lib
+        #mkdir -p /var/lib
 
-        uci set system.@system[0].log_type=file
-        uci set system.@system[0].log_file=/var/log/syslog
-        uci set system.@system[0].log_size=0
+        #uci set system.@system[0].log_type=file
+        #uci set system.@system[0].log_file=/var/log/syslog
+        #uci set system.@system[0].log_size=0
 
-        uci commit
-        sync
-        reboot
-    fi
+        #uci commit
+        #sync
+        #reboot
+    #fi
 }
 
 # Fix our DNS and update packages and do not check https certs
@@ -168,9 +168,9 @@ fixPackagesDNS()
     fi
 
     log_say "Installing opkg packages"
-    opkg --no-check-certificate update
-    opkg --no-check-certificate install wget-ssl unzip ca-bundle ca-certificates
-    opkg --no-check-certificate install git git-http jq curl
+    opkg update
+    opkg install wget-ssl unzip ca-bundle ca-certificates
+    opkg install git git-http jq curl bash nano
 }
 
 # Wait for Internet connection
