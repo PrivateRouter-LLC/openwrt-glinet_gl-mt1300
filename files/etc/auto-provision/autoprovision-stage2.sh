@@ -161,6 +161,4 @@ fixPackagesDNS
 
 autoprovisionStage2
 
-bash /etc/stage3.sh || log_say "ERROR: stage3.sh failed"
-
 # reboot
