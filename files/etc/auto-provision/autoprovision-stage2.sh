@@ -113,9 +113,8 @@ autoprovisionStage2()
 
     chmod +x ${overlay_root}/etc/rc.local
     cat >${overlay_root}/etc/rc.local <<EOF
-# Commented out for now, we will run it manually
-# chmod a+x /etc/stage3.sh
-# bash /etc/stage3.sh || exit 1
+chmod a+x /etc/stage3.sh
+bash /etc/stage3.sh || exit 1
 EOF
 
 }
@@ -161,4 +160,4 @@ fixPackagesDNS
 
 autoprovisionStage2
 
-# reboot
+reboot
