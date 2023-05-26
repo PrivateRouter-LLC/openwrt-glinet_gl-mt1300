@@ -9,22 +9,6 @@ log_say()
     logger "${SCRIPT_NAME}: ${1}"
 }
 
-# Domain to check
-domain="privaterouter.com"
-
-# DNS server to set if domain resolution fails
-dns_server="1.1.1.1"
-
-# Perform the DNS resolution check
-if ! nslookup "$domain" >/dev/null 2>&1; then
-  log_say "Domain resolution failed. Setting DNS server to $dns_server."
-
-  # Update resolv.conf with the new DNS server
-  echo "nameserver $dns_server" > /etc/resolv.conf
-else
-  log_say "Domain resolution successful."
-fi
-
 log_say "                                                                      "
 log_say " ███████████             ███                         █████            "
 log_say "░░███░░░░░███           ░░░                         ░░███             "
@@ -80,7 +64,7 @@ log_say "Extracting startup.tar.gz"
 tar -xzf /tmp/startup.tar.gz -C /etc
 
 log_say "Removing our script before reboot"
-rm "/etc/stage3.sh"
+rm -- "$0"
 
 log_say "Reboot to uptake our rc.custom boot script"
 reboot
