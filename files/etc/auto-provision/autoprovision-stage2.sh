@@ -69,6 +69,13 @@ installPackages()
    log_say "░░░░░   ░░░░░  ░░░░░░    ░░░░░░░░    ░░░░░   ░░░░░░  ░░░░░            "
 
    opkg update
+   #mesh support
+   opkg remove wpad
+   opkg remove wpad wpad-basic
+   opkg remove wpad-basic-openssl
+   opkg remove wpad-basic-wolfssl
+   opkg remove wpad-wolfssl
+   opkg install wpad-mesh-openssl
    
    #Go Go Packages
    opkg install base-files busybox cgi-io dropbear firewall fstools fwtool getrandom hostapd-common ip6tables iptables iw iwinfo jshn jsonfilter kernel
