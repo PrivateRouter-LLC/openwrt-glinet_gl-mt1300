@@ -21,6 +21,6 @@ cd openwrt-*/
 make clean
 
 make image  PROFILE="glinet_gl-mt1300" \
-           PACKAGES="block-mount kmod-fs-ext4 kmod-usb-storage blkid mount-utils swap-utils e2fsprogs fdisk luci dnsmasq bash" \
+           PACKAGES="block-mount kmod-fs-ext4 kmod-usb-storage blkid mount-utils swap-utils e2fsprogs fdisk luci dnsmasq bash wpad-mesh-openssl" \
            FILES="${BASEDIR}/files/" \
            BIN_DIR="$OUTPUT"
