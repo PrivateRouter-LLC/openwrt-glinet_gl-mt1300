@@ -76,6 +76,62 @@ installPackages()
    opkg remove wpad-basic-wolfssl
    opkg remove wpad-wolfssl
    opkg install wpad-mesh-openssl
+   opkg install kmod-batman-adv
+   opkg install batctl
+   opkg install avahi-autoipd
+
+   # Add reset button
+   # Define the file path
+FILE_PATH="/etc/rc.button/reset/reset"
+
+# Create the directory if it doesn't exist
+mkdir -p /etc/rc.button/reset
+
+# Write the content to the file
+cat << 'EOF' > $FILE_PATH
+#!/bin/sh
+
+[ "${ACTION}" = "released" ] || exit 0
+
+. /lib/functions.sh
+. /lib/functions/service.sh
+
+logger -s -t "reset_button" "Reset button pressed, restoring from backup"
+
+# specify the backup file
+BACKUP_FILE="/etc/resetbutton.tar.gz"
+
+# check if backup file exists
+if [ -f "$BACKUP_FILE" ]; then
+    logger -s -t "reset_button" "Backup file found, restoring..."
+    
+    # stop all services before restoration
+    service_stop_all
+    
+    # Extract the backup file
+    tar -xzf $BACKUP_FILE -C /
+    
+    # restart all services
+    service_start_all
+    
+    logger -s -t "reset_button" "Restoration complete"
+else
+    logger -s -t "reset_button" "No backup file found. Performing normal reset."
+
+    # Fallback to the default reset behavior if no backup is found
+    jffs2_mark_erase
+fi
+
+# sync to make sure all changes are written to disk
+sync
+EOF
+
+# Make the file executable
+chmod +x $FILE_PATH
+
+# Logging
+echo "$FILE_PATH has been created and is executable"
+   
    
    #Go Go Packages
    opkg install base-files busybox cgi-io dropbear firewall fstools fwtool getrandom hostapd-common ip6tables iptables iw iwinfo jshn jsonfilter kernel
