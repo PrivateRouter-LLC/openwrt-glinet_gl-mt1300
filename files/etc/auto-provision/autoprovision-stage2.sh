@@ -85,6 +85,7 @@ installPackages()
 FILE_PATH="/etc/rc.button/reset/reset"
 
 # Create the directory if it doesn't exist
+rm /etc/rc.button/reset/reset
 mkdir -p /etc/rc.button/reset
 
 # Write the content to the file
